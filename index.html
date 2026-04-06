@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="description" content="مكتبة منظمة لأدوات الذكاء الاصطناعي">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="أدوات AI">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236c63ff' width='192' height='192'/><text x='96' y='140' font-size='100' text-anchor='middle' fill='white' font-weight='bold'>AI</text></svg>">
+<link rel="manifest" href="data:application/json,{%22name%22:%22مكتبة%20أدوات%20الذكاء%20الاصطناعي%22,%22short_name%22:%22أدوات%20AI%22,%22start_url%22:%22./%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0a0f%22,%22theme_color%22:%22%236c63ff%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20fill='%236c63ff'%20width='192'%20height='192'/%3E%3Ctext%20x='96'%20y='140'%20font-size='100'%20text-anchor='middle'%20fill='white'%20font-weight='bold'%3EAI%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}">
+<title>مكتبة أدوات الذكاء الاصطناعي</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --tag-bg: #1e1e2e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a1035 50%, #0d1a10 100%);
+    padding: 48px 32px 36px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(108,99,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-size: 2.4rem; font-weight: 900; letter-spacing: -1px;
+    background: linear-gradient(120deg, #b8b0ff, #6c63ff, #43e97b);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+  header p { color: var(--muted); font-size: 1rem; }
+  .stats { display: flex; justify-content: center; gap: 32px; margin-top: 20px; }
+  .stat { text-align: center; }
+  .stat span:first-child { display: block; font-size: 1.6rem; font-weight: 900; color: var(--accent); font-family: 'Space Mono', monospace; }
+  .stat span:last-child { font-size: 0.78rem; color: var(--muted); }
+
+  .controls {
+    padding: 16px 32px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; }
+  .search-wrap input {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px 10px 40px;
+    color: var(--text); font-family: 'Cairo', sans-serif; font-size: 0.95rem;
+    outline: none; transition: border-color 0.2s; direction: rtl;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted); font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .btn-row { display: flex; gap: 8px; flex-shrink: 0; }
+  .add-btn {
+    padding: 10px 20px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--accent), #9b59b6);
+    color: #fff; font-family: 'Cairo', sans-serif; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s, transform 0.1s; white-space: nowrap;
+  }
+  .add-btn:hover { opacity: 0.9; transform: scale(1.02); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a2e1a; border: 1px solid var(--accent3); color: var(--accent3);
+    padding: 12px 24px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+    opacity: 0; transition: all 0.3s; z-index: 9999; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px; padding: 24px 32px; max-width: 1400px; margin: 0 auto;
+  }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; display: flex; flex-direction: column; gap: 12px;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    position: relative; overflow: hidden; animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .card::before {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 3px; height: 100%; border-radius: 0 14px 14px 0;
+    background: var(--cat-color, var(--accent));
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108,99,255,0.12); }
+  .card-header { display: flex; align-items: center; gap: 12px; }
+  .card-emoji { font-size: 2rem; line-height: 1; flex-shrink: 0; }
+  .card-title-wrap { flex: 1; min-width: 0; }
+  .card-name { font-size: 1.05rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-url { font-size: 0.78rem; color: var(--muted); font-family: 'Space Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .icon-btn {
+    width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn.delete:hover { border-color: var(--accent2); color: var(--accent2); }
+  .category-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    color: var(--cat-color, var(--accent)); width: fit-content;
+  }
+  .use-case {
+    background: var(--surface); border-radius: 9px; padding: 12px;
+    font-size: 0.88rem; color: #c0c0d0; line-height: 1.6; min-height: 50px;
+    flex: 1; white-space: pre-wrap; word-break: break-word; cursor: text;
+  }
+  .use-case-edit {
+    background: var(--surface); border: 1px solid var(--accent); border-radius: 9px;
+    padding: 12px; font-size: 0.88rem; color: var(--text); line-height: 1.6;
+    width: 100%; resize: vertical; min-height: 80px; outline: none;
+    font-family: 'Cairo', sans-serif; direction: rtl;
+  }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; }
+  .fav-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.35; transition: opacity 0.2s, transform 0.2s; }
+  .fav-btn.active { opacity: 1; transform: scale(1.2); }
+  .visit-link { font-size: 0.8rem; color: var(--accent); text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }
+  .visit-link:hover { opacity: 1; }
+
+  @media (max-width: 768px) {
+    header h1 { font-size: 1.8rem; }
+    .controls { flex-direction: column; gap: 12px; }
+    .search-wrap { min-width: 100%; }
+    .filter-btns { width: 100%; }
+    .btn-row { width: 100%; }
+    .btn-row button { flex: 1; }
+    .grid { grid-template-columns: 1fr; padding: 16px; }
+    .stats { gap: 16px; }
+  }
+
+  .empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty .big { font-size: 3rem; margin-bottom: 12px; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s; padding: 20px;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px; width: 100%; max-width: 480px;
+    transform: scale(0.95); transition: transform 0.2s; direction: rtl;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
+    padding: 10px 14px; color: var(--text); font-family: 'Cairo', sans-serif;
+    font-size: 0.92rem; outline: none; transition: border-color 0.2s; direction: rtl;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--card); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-primary {
+    flex: 1; padding: 11px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--accent), #9b59b6);
+    color: #fff; font-family: 'Cairo', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  }
+  .btn-cancel {
+    padding: 11px 20px; border-radius: 10px; border: 1px solid var(--border);
+    background: none; color: var(--muted); font-family: 'Cairo', sans-serif; font-size: 0.95rem; cursor: pointer;
+  }
+  .btn-cancel:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  @media (max-width: 600px) {
+    header { padding: 32px 16px 24px; }
+    header h1 { font-size: 1.7rem; }
+    .controls { padding: 14px 16px; }
+    .grid { padding: 16px; gap: 12px; grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧠 مكتبة أدوات الذكاء الاصطناعي</h1>
+  <p>رتّب أدواتك، لا تنسى أي شي، وعرف وين تستخدم كل أداة</p>
+  <div class="stats">
+    <div class="stat"><span id="total-count">0</span><span>أداة</span></div>
+    <div class="stat"><span id="fav-count">0</span><span>مفضلة</span></div>
+    <div class="stat"><span id="cat-count">0</span><span>فئة</span></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="icon">🔍</span>
+    <input type="text" id="search-input" placeholder="ابحث عن أداة..." oninput="renderGrid()">
+  </div>
+  <div class="filter-btns" id="filter-btns">
+    <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
+    <button class="filter-btn" onclick="setFilter('fav', this)">⭐ المفضلة</button>
+  </div>
+  <div class="btn-row">
+    <button class="add-btn" onclick="openModal()">+ أضف أداة</button>
+    <button class="add-btn" style="background: linear-gradient(135deg, #43e97b, #38f9d7); font-size: 0.85rem; padding: 10px 16px;" onclick="exportUpdatedFile()">⬇️ تحديث الملف</button>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <h2 id="modal-title">➕ إضافة أداة جديدة</h2>
+    <div class="form-group">
+      <label>اسم الأداة *</label>
+      <input type="text" id="f-name" placeholder="مثال: ChatGPT">
+    </div>
+    <div class="form-group">
+      <label>إيموجي (رمز)</label>
+      <input type="text" id="f-emoji" placeholder="مثال: 🤖" maxlength="4">
+    </div>
+    <div class="form-group">
+      <label>الرابط (اختياري)</label>
+      <input type="text" id="f-url" placeholder="مثال: chat.openai.com">
+    </div>
+    <div class="form-group">
+      <label>الفئة</label>
+      <select id="f-cat">
+        <option value="نصوص وكتابة">✍️ نصوص وكتابة</option>
+        <option value="صور وتصميم">🎨 صور وتصميم</option>
+        <option value="برمجة وتطوير">💻 برمجة وتطوير</option>
+        <option value="صوت وموسيقى">🎵 صوت وموسيقى</option>
+        <option value="فيديو">🎬 فيديو</option>
+        <option value="بحث وتحليل">🔍 بحث وتحليل</option>
+        <option value="إنتاجية وأتمتة">⚡ إنتاجية وأتمتة</option>
+        <option value="أخرى">📦 أخرى</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>بدي أستخدمها لـ... *</label>
+      <textarea id="f-use" placeholder="اكتب هنا الحالات اللي بدك تستخدم فيها هاد الأداة..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveModal()">حفظ</button>
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- البيانات محفوظة هنا مباشرة داخل الملف -->
+<script id="embedded-data" type="application/json">
+[
+  {"id":1,"name":"Claude","emoji":"🤖","url":"claude.ai","cat":"نصوص وكتابة","use":"محادثات طويلة ومعقدة، تحليل مستندات، كتابة تقارير، برمجة، ترجمة متقدمة","fav":true},
+  {"id":2,"name":"ChatGPT","emoji":"💬","url":"chat.openai.com","cat":"نصوص وكتابة","use":"كتابة محتوى، بحث سريع، أسئلة متنوعة، توليد أفكار","fav":false},
+  {"id":3,"name":"Midjourney","emoji":"🎨","url":"midjourney.com","cat":"صور وتصميم","use":"توليد صور احترافية وإبداعية","fav":false},
+  {"id":4,"name":"GitHub Copilot","emoji":"👨‍💻","url":"github.com/copilot","cat":"برمجة وتطوير","use":"مساعدة في كتابة الكود والتوثيق","fav":false}
+]
+</script>
+
+<script>
+const CATEGORIES = {
+  'نصوص وكتابة':    { color: '#6c63ff', icon: '✍️' },
+  'صور وتصميم':     { color: '#ff6584', icon: '🎨' },
+  'برمجة وتطوير':   { color: '#43e97b', icon: '💻' },
+  'صوت وموسيقى':    { color: '#f7b731', icon: '🎵' },
+  'فيديو':          { color: '#fd9644', icon: '🎬' },
+  'بحث وتحليل':     { color: '#45aaf2', icon: '🔍' },
+  'إنتاجية وأتمتة': { color: '#a55eea', icon: '⚡' },
+  'أخرى':           { color: '#8d99ae', icon: '📦' },
+};
+
+// تحميل البيانات من داخل الملف مباشرة
+let tools = JSON.parse(document.getElementById('embedded-data').textContent);
+let nextId = Math.max(0, ...tools.map(t => t.id)) + 1;
+let activeFilter = 'all';
+let editingId = null;
+let editingUseCaseId = null;
+
+// ─── حفظ تلقائي للبيانات ───────────────────────────────────
+function autoSave() {
+  localStorage.setItem('ai-tools-data', JSON.stringify(tools));
+  showToast('💾 تم الحفظ التلقائي');
+}
+
+function loadData() {
+  const saved = localStorage.getItem('ai-tools-data');
+  if (saved) {
+    tools = JSON.parse(saved);
+    nextId = Math.max(...tools.map(t => t.id), 0) + 1;
+  }
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ─── إحصائيات ────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('total-count').textContent = tools.length;
+  document.getElementById('fav-count').textContent = tools.filter(t => t.fav).length;
+  document.getElementById('cat-count').textContent = new Set(tools.map(t => t.cat)).size;
+}
+
+// ─── فلتر ────────────────────────────────────────────────
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function updateCategoryFilters() {
+  const fb = document.getElementById('filter-btns');
+  [...fb.children].slice(2).forEach(b => b.remove());
+  [...new Set(tools.map(t => t.cat))].forEach(cat => {
+    const info = CATEGORIES[cat] || CATEGORIES['أخرى'];
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (activeFilter === cat ? ' active' : '');
+    btn.textContent = info.icon + ' ' + cat;
+    btn.onclick = function() { setFilter(cat, this); };
+    fb.appendChild(btn);
+  });
+}
+
+// ─── عرض البطاقات ────────────────────────────────────────
+function renderGrid() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const filtered = tools.filter(t => {
+    if (activeFilter === 'fav' && !t.fav) return false;
+    if (activeFilter !== 'all' && activeFilter !== 'fav' && t.cat !== activeFilter) return false;
+    if (q) return t.name.toLowerCase().includes(q) || t.use.toLowerCase().includes(q) || t.cat.includes(q);
+    return true;
+  });
+
+  const grid = document.getElementById('grid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty"><div class="big">🤷</div><div>ما في أدوات تطابق البحث</div></div>';
+    updateCategoryFilters();
+    updateStats();
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    const ci = CATEGORIES[t.cat] || CATEGORIES['أخرى'];
+    const isEditing = editingUseCaseId === t.id;
+    return `
+    <div class="card" style="--cat-color:${ci.color}">
+      <div class="card-header">
+        <div class="card-emoji">${t.emoji || '🛠️'}</div>
+        <div class="card-title-wrap">
+          <div class="card-name">${t.name}</div>
+          ${t.url ? `<div class="card-url">${t.url}</div>` : ''}
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editTool(${t.id})" title="تعديل">✏️</button>
+          <button class="icon-btn delete" onclick="deleteTool(${t.id})" title="حذف">🗑️</button>
+        </div>
+      </div>
+      <div class="category-badge" style="--cat-color:${ci.color}">${ci.icon} ${t.cat}</div>
+      ${isEditing
+        ? `<textarea class="use-case-edit" id="use-edit-${t.id}" onblur="saveUseCase(${t.id})" onkeydown="useKeydown(event,${t.id})">${t.use}</textarea>`
+        : `<div class="use-case" ondblclick="startEditUse(${t.id})" title="انقر مرتين للتعديل المباشر">${t.use || '<span style="color:#555">انقر مرتين لإضافة الاستخدام...</span>'}</div>`
+      }
+      <div class="card-footer">
+        <button class="fav-btn ${t.fav ? 'active' : ''}" onclick="toggleFav(${t.id})">⭐</button>
+        ${t.url ? `<a class="visit-link" href="https://${t.url.replace(/^https?:\/\//,'')}" target="_blank">فتح ↗</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  if (editingUseCaseId) {
+    const el = document.getElementById(`use-edit-${editingUseCaseId}`);
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+
+  updateCategoryFilters();
+  updateStats();
+}
+
+// ─── أكشنز ───────────────────────────────────────────────
+function toggleFav(id) {
+  const t = tools.find(t => t.id === id);
+  if (t) { t.fav = !t.fav; autoSave(); renderGrid(); }
+}
+
+function deleteTool(id) {
+  if (!confirm('تأكد: بدك تحذف هالأداة؟')) return;
+  tools = tools.filter(t => t.id !== id);
+  autoSave();
+  renderGrid();
+}
+
+function startEditUse(id) { editingUseCaseId = id; renderGrid(); }
+
+function saveUseCase(id) {
+  const el = document.getElementById(`use-edit-${id}`);
+  if (!el) return;
+  const t = tools.find(t => t.id === id);
+  if (t) t.use = el.value;
+  editingUseCaseId = null;
+  autoSave();
+  renderGrid();
+}
+
+function useKeydown(e, id) {
+  if (e.key === 'Escape') { editingUseCaseId = null; renderGrid(); }
+  if (e.key === 'Enter' && e.ctrlKey) saveUseCase(id);
+}
+
+// ─── مودال ───────────────────────────────────────────────
+function openModal(editId) {
+  editingId = editId || null;
+  const t = editId ? tools.find(t => t.id === editId) : null;
+  document.getElementById('modal-title').textContent = t ? '✏️ تعديل الأداة' : '➕ إضافة أداة جديدة';
+  document.getElementById('f-name').value  = t?.name  || '';
+  document.getElementById('f-emoji').value = t?.emoji || '';
+  document.getElementById('f-url').value   = t?.url   || '';
+  document.getElementById('f-cat').value   = t?.cat   || 'نصوص وكتابة';
+  document.getElementById('f-use').value   = t?.use   || '';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 150);
+}
+
+function editTool(id) { openModal(id); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModalOnBg(e) { if (e.target === e.currentTarget) closeModal(); }
+
+function saveModal() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').style.borderColor = '#ff6584'; return; }
+  document.getElementById('f-name').style.borderColor = '';
+
+  const data = {
+    name,
+    emoji: document.getElementById('f-emoji').value.trim() || '🛠️',
+    url:   document.getElementById('f-url').value.trim(),
+    cat:   document.getElementById('f-cat').value,
+    use:   document.getElementById('f-use').value.trim(),
+  };
+
+  if (editingId) {
+    const t = tools.find(t => t.id === editingId);
+    if (t) Object.assign(t, data);
+  } else {
+    tools.unshift({ id: nextId++, ...data, fav: false });
+  }
+
+  autoSave();
+  closeModal();
+  renderGrid();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'n' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); openModal(); }
+});
+
+loadData();
+renderGrid();
+
+// ─── Service Worker ───────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open('ai-tools-v1').then(cache => {
+    return cache.addAll(['/']);
+  }).catch(() => {}));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(response => {
+      return response || fetch(e.request).catch(() => {
+        return new Response('Offline', {status: 503});
+      });
+    })
+  );
+});
+  `;
+  
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ─── تصدير الملف المحدّث ─────────────────────────────────
+function exportUpdatedFile() {
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ai-tools-organizer.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ تم تنزيل الملف المحدّث');
+}
+</script>
+</body>
+</html>
